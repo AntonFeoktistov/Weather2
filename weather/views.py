@@ -2,4 +2,4 @@ from django.http import HttpResponse
 
 
 def home_page(request):
-    return HttpResponse("hello2")
+    return HttpResponse("hello3")
