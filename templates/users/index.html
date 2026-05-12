@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row g-4">
+    
+    <!-- Правая колонка: кнопки входа и регистрации -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                <h4 class="text-center mb-3">{{ user.username }}</h4>
+                <form method="post" action="{% url 'users:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        Выйти
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'users:login' %}" class="btn btn-primary w-100 mb-3">
+                    Войти
+                </a>
+                <a href="{% url 'users:register' %}" class="btn btn-outline-primary w-100">
+                    Регистрация
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

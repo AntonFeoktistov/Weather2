@@ -1,9 +1,9 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from weather.views.home_view import HomeView
 
-from weather.views import home_page
+app_name = "weather"
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', home_page),
+    path("", HomeView.as_view(), name="home"),
 ]
