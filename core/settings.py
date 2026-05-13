@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-yqi3ppnokpfuelk@@rm7oi#9de%1a65-&6b-8467gh_@*-k*s2"
-
+OPENWEATHER_API_KEY = "771c007c030bbd501e772b3dfa430bb0"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -64,8 +64,12 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "weather_db",
+        "USER": "anton",
+        "PASSWORD": "anton",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 

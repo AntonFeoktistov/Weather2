@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
-from weather.views.home_view import HomeView
+from weather.views import HomeView
 
 app_name = "weather"
 

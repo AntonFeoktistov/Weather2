@@ -3,8 +3,6 @@
 {% block title %}Поиск погоды{% endblock %}
 
 {% block content %}
-
-
 <div class="row g-4">
     <!-- Левая колонка: поиск и погода -->
     <div class="col-lg-8">
@@ -14,9 +12,7 @@
                 <form method="post" action="{% url 'weather:home' %}">
                     {% csrf_token %}
                     <div class="input-group">
-                        <input type="text" name="query" class="form-control form-control-lg"
-                            placeholder="Введите название города или локации..." value="{{ query|default:'' }}"
-                            autocomplete="off" required>
+                        {{ form.query }}
                         <button type="submit" class="btn btn-primary btn-lg">
                             Поиск
                         </button>
@@ -24,6 +20,16 @@
                 </form>
             </div>
         </div>
-<!-- / -->
+    </div>
+</div>
+<div> 
+    {% for location in locations %} 
+    <p> {{ location }} </p>
+    {% endfor %} 
+    <p> {{ query }} </p>
+    <p> {{ weather.location.name_en }}</p>
+    <p> {{ weather.temperature}}</p>
+    <p> {{ weather.description }}</p>
+    <p> {{ weather.wind_speed }}</p>
 </div>
 {% endblock %}
