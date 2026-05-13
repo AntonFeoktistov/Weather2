@@ -13,16 +13,16 @@ class WeatherFinder:
 
     def get_weather_by_location_name(self, location_name):
 
-        location = self._get_location_by_name (location_name)
+        location = self._get_location_by_name(location_name)
         weather = self._get_weather_by_location(location)
         if not weather.location:
-            raise 
+            return self._make_error_weather_dto()
         return weather
 
     def _get_location_by_name(self, location_name):
 
         url = "http://api.openweathermap.org/geo/1.0/direct"
-        params = {"q" : location_name, "limit": 5, "appid": settings.OPENWEATHER_API_KEY}
+        params = {"q": location_name, "limit": 5, "appid": settings.OPENWEATHER_API_KEY}
 
         try:
             response = requests.get(url, params=params, timeout=10)

@@ -5,35 +5,129 @@
 {% block content %}
 
 {% if messages %}
-{% for message in messages %}
-<div class="alert alert-{{ message.tags }}">
-    {{ message }}
-</div>
-{% endfor %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
 {% endif %}
 
 <div class="row g-4">
-    
-    <!-- Правая колонка: кнопки входа и регистрации -->
+    <!-- Центральная колонка: список недавно просмотренных локаций -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🕐 Недавно просмотренные локации</h5>
+            </div>
+            <div class="card-body">
+                {% if locations %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for location in locations %}
+                            <div class="card border shadow-sm">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-5">
+                                            <h5 class="mb-1">{{ location.name }}</h5>
+                                            <div class="small text-muted">
+                                                 {{ location.weather_updated_at}}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-7">
+                                            {% if location.weather_data %}
+                                                <div class="row text-center">
+                                                    <div class="col-4">
+                                                        <div class="fw-bold fs-5">{{ location.weather_data.temperature|floatformat:1 }}°</div>
+                                                        <small class="text-muted">температура</small>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div class="fw-bold">{{ location.weather_data.description|truncatechars:15|default:"—" }}</div>
+                                                        <small class="text-muted">описание</small>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div class="fw-bold">{{ location.weather_data.wind_speed|floatformat:1|default:"—" }}</div>
+                                                        <small class="text-muted">ветер, м/с</small>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center text-muted">
+                                                    <small>Погода не загружена</small>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <p>Нет недавно просмотренных локаций</p>
+                        <a href="{% url 'weather:home' %}" class="btn btn-sm btn-outline-primary">
+                            🔍 Найти и посмотреть погоду
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Правая колонка: вход/личный кабинет -->
     <div class="col-lg-4">
         <div class="card shadow-sm">
+            <div class="card-header bg-secondary bg-opacity-25">
+                <h5 class="mb-0">
+                    {% if user.is_authenticated %}
+                        👤 Личный кабинет
+                    {% else %}
+                        🔐 Вход в систему
+                    {% endif %}
+                </h5>
+            </div>
             <div class="card-body">
                 {% if user.is_authenticated %}
-                <h4 class="text-center mb-3">{{ user.username }}</h4>
-                <form method="post" action="{% url 'users:logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger w-100">
-                        Выйти
-                    </button>
-                </form>
+                    <div class="text-center">
+                        <h4 class="mb-3">{{ user.username }}</h4>
+                        <p class="text-muted mb-3">
+                            Вы можете искать погоду<br>
+                            и сохранять любимые локации
+                        </p>
+                        <a href="{% url 'weather:home' %}" class="btn btn-primary w-100 mb-2">
+                            🌡️ Моя погода
+                        </a>
+                        <form method="post" action="{% url 'users:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                🚪 Выйти
+                            </button>
+                        </form>
+                    </div>
                 {% else %}
-                <a href="{% url 'users:login' %}" class="btn btn-primary w-100 mb-3">
-                    Войти
-                </a>
-                <a href="{% url 'users:register' %}" class="btn btn-outline-primary w-100">
-                    Регистрация
-                </a>
+                    <div class="text-center">
+                        <p class="mb-3">
+                            Войдите или зарегистрируйтесь,<br>
+                            чтобы сохранять локации<br>
+                            и следить за погодой
+                        </p>
+                        <a href="{% url 'users:login' %}" class="btn btn-primary w-100 mb-2">
+                            Войти
+                        </a>
+                        <a href="{% url 'users:register' %}" class="btn btn-outline-primary w-100">
+                            Регистрация
+                        </a>
+                    </div>
                 {% endif %}
+            </div>
+        </div>
+
+        <!-- Дополнительный блок: о сервисе -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-body text-center">
+                <small class="text-muted">
+                    🌍 Прогноз погоды для любой точки мира<br>
+                    Сохраняйте любимые города<br>
+                    и следите за изменением погоды
+                </small>
             </div>
         </div>
     </div>

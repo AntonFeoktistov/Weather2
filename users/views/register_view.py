@@ -18,5 +18,5 @@ class RegisterView(View):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("weather:home")
+            return redirect("users:index")
         return render(request, self.template_name, {"form": form})

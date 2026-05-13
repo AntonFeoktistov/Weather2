@@ -14,7 +14,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'weather:home' %}">WeatherApp</a>
+            <a class="navbar-brand" href="{% url 'users:index' %}">WeatherApp</a>
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                 <span class="nav-link text-light">Привет, {{ user.username }}!</span>

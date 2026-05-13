@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views import View
 
+from weather.models import Location
+
 
 class IndexView(View):
     def get(self, request):
-        if request.user.is_authenticated:
-            return redirect("weather:home")
-        locations = ["loc1", "loc2", "loc3"]
+        locations = Location.objects.order_by("-weather_updated_at")[:10]
         return render(request, "users/index.html", {"locations": locations})
