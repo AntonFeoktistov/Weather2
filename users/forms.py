@@ -2,27 +2,30 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .validators import validate_character_types, validate_minimum_length
+from .validators import (
+    validate_character_types,
+    validate_minimum_length,
+    validate_password_max_length,
+    validate_username_max_length,
+)
 
 
 class SignUpForm(UserCreationForm):
     username = forms.CharField(
         label="Имя пользователя",
         widget=forms.TextInput(attrs={"class": "form-control"}),
+        validators=[validate_username_max_length],
         help_text="Обязательное поле.",
-    )
-
-    email = forms.EmailField(
-        label="Email",
-        widget=forms.EmailInput(attrs={"class": "form-control"}),
-        required=False,
-        help_text="Необязательно, но рекомендуется",
     )
 
     password1 = forms.CharField(
         label="Пароль",
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
-        validators=[validate_minimum_length, validate_character_types],
+        validators=[
+            validate_minimum_length,
+            validate_character_types,
+            validate_password_max_length,
+        ],
         help_text="Минимум 2 буквы и 2 цифры",
     )
 

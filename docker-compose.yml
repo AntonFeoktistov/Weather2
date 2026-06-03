@@ -1,36 +1,48 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: django_postgres
-    restart: always
+    container_name: myproject_db
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: myproject
+      POSTGRES_USER: myproject
+      POSTGRES_PASSWORD: myproject
     ports:
-      - "5432:5432"        
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data   
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      test: ["CMD-SHELL", "pg_isready -U myproject"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   web:
     build: .
-    container_name: django_app
+    container_name: myproject_web
     ports:
       - "8000:8000"
     volumes:
-      - .:/app               
+      - .:/app
     environment:
-      - DEBUG=1
-      - DATABASE_URL=postgresql://myuser:mypassword@db:5432/mydb
+      - DATABASE_URL=postgresql://myproject:myproject@db:5432/myproject
     depends_on:
       db:
         condition: service_healthy
     command: python manage.py runserver 0.0.0.0:8000
 
+  tests:
+    build: .
+    container_name: myproject_tests
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://myproject:myproject@db:5432/myproject
+    depends_on:
+      db:
+        condition: service_healthy
+    command: pytest
+    profiles:
+      - tests
+    stdin_open: true
 volumes:
   postgres_data:

@@ -18,7 +18,7 @@
     <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">🕐 Популярные локации:</h5>
+                <h5 class="mb-0">🕐 Пользователи недавно искали:</h5>
             </div>
             <div class="card-body">
                 {% if locations %}
@@ -89,8 +89,7 @@
                     <div class="text-center">
                         <h4 class="mb-3">{{ user.username }}</h4>
                         <p class="text-muted mb-3">
-                            Вы можете искать погоду<br>
-                            и сохранять любимые локации
+                            Зайдите в личный кабинет, чтобы искать погоду и сохранять локации
                         </p>
                         <a href="{% url 'weather:home' %}" class="btn btn-primary w-100 mb-2">
                             🌡️ Моя погода
