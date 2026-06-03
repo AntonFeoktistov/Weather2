@@ -1,6 +1,9 @@
-from django.contrib import admin
-from django.urls import include, path
-from weather.views import AddLocationView, DeleteLocationView, HomeView, RefreshWeatherView
+from django.urls import path
+
+from weather.views.add_location_view import AddLocationView
+from weather.views.delete_location_view import DeleteLocationView
+from weather.views.home_view import HomeView
+from weather.views.refresh_weather_view import RefreshWeatherView
 
 app_name = "weather"
 

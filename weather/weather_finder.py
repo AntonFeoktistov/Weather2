@@ -1,94 +1,82 @@
 import requests
-import logging
 from django.conf import settings
-from weather.dtos import LocationDto, WeatherDto
-from weather.serializer import Serializer
 
-logger = logging.getLogger(__name__)
+from weather.dtos import LocationDto, WeatherDto, to_dto
+from weather.errors import LocationNotFoundError, WeatherNotFoundError
 
 
 class WeatherFinder:
-    def __init__(self):
-        self.serializer = Serializer()
-
     def get_weather_by_location_name(self, location_name):
-
-        location = self._get_location_by_name(location_name)
-        weather = self._get_weather_by_location(location)
-        if not weather.location:
-            return self._make_error_weather_dto()
-        return weather
+        try:
+            location = self._get_location_by_name(location_name)
+            weather = self._get_weather_by_location(location)
+            return weather
+        except (LocationNotFoundError, WeatherNotFoundError):
+            raise WeatherNotFoundError()
 
     def _get_location_by_name(self, location_name):
-
-        url = "http://api.openweathermap.org/geo/1.0/direct"
-        params = {"q": location_name, "limit": 5, "appid": settings.OPENWEATHER_API_KEY}
-
+        print(location_name)
+        print(settings.OPENWEATHER_API_KEY, settings.OPENWEATHER_LOCATION_URL)
         try:
-            response = requests.get(url, params=params, timeout=10)
-            response.raise_for_status()
-            locations = response.json()
-
-            if not locations:
-                logger.info(f"Город , {location_name}' не найден")
-                return self._make_error_location_dto()
-
-            location = locations[0]
-
-            local_names = location.get("local_names", {})
-            name_ru = local_names.get("ru", location.get("name"))
-
-            result = {
-                "lat": round(location["lat"], 3),
-                "lon": round(location["lon"], 3),
-                "name_en": location["name"],
-                "name_ru": name_ru,
-                "state": location.get("state"),
+            print(location_name)
+            params = {
+                "q": location_name,
+                "limit": 1,
+                "appid": settings.OPENWEATHER_API_KEY,
             }
-
-            return self.serializer.make_location_dto(result)
-
-        except Exception as e:
-            logger.error(f"Geocoding error: {e}")
-            return self._make_error_location_dto()
+            response = requests.get(
+                settings.OPENWEATHER_LOCATION_URL, params=params, timeout=10
+            )
+            response.raise_for_status()
+            location = response.json()[0]
+            print(location)
+            location_dto = self._make_location_dto(location)
+            return location_dto
+        except Exception:
+            raise LocationNotFoundError()
 
     def _get_weather_by_location(self, location: LocationDto):
-
-        if not location.name_en:
-            return self._make_error_weather_dto()
-
-        lat, lon = location.lat, location.lon
-        url = "https://api.openweathermap.org/data/2.5/weather"
-        params = {
-            "lat": lat,
-            "lon": lon,
-            "appid": settings.OPENWEATHER_API_KEY,
-            "units": "metric",
-            "lang": "ru",
-        }
-
         try:
-            response = requests.get(url, params=params, timeout=10)
+            params = {
+                "lat": location.lat,
+                "lon": location.lon,
+                "appid": settings.OPENWEATHER_API_KEY,
+                "units": "metric",
+                "lang": "ru",
+            }
+            response = requests.get(
+                settings.OPENWEATHER_WEATHER_URL, params=params, timeout=10
+            )
             data = response.json()
 
             if data.get("cod") != 200:
-                return self._make_error_weather_dto()
+                raise WeatherNotFoundError("OPENWEATHER API Problem")
 
-            result = {
-                "location": location,
-                "temperature": data["main"]["temp"],
-                "description": data["weather"][0]["description"],
-                "wind_speed": data["wind"]["speed"],
-            }
+            weather_dto = self._make_weather_dto(location, data)
+            return weather_dto
 
-            return self.serializer.make_weather_dto(result)
+        except Exception:
+            raise WeatherNotFoundError()
 
-        except Exception as e:
-            logger.error(f"Weather error: {e}")
-            return self._make_error_weather_dto()
+    def _make_location_dto(self, location: dict):
+        local_names = location.get("local_names", {})
+        name_ru = local_names.get("ru", location.get("name"))
+        location_dict = {
+            "lat": round(location["lat"], 3),
+            "lon": round(location["lon"], 3),
+            "name_en": location["name"],
+            "name_ru": name_ru,
+        }
+        print(location_dict)
+        location_dto = to_dto(LocationDto, location_dict)
+        return location_dto
 
-    def _make_error_location_dto(self):
-        return LocationDto()
-
-    def _make_error_weather_dto(self):
-        return WeatherDto()
+    def _make_weather_dto(self, location: LocationDto, data: dict):
+        weather_dict = {
+            "location": location,
+            "temperature": data["main"]["temp"],
+            "description": data["weather"][0]["description"],
+            "wind_speed": data["wind"]["speed"],
+        }
+        weather_dto = to_dto(WeatherDto, weather_dict)
+        return weather_dto
