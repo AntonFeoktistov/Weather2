@@ -1,5 +1,9 @@
+import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,8 +12,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-yqi3ppnokpfuelk@@rm7oi#9de%1a65-&6b-8467gh_@*-k*s2"
-OPENWEATHER_API_KEY = "771c007c030bbd501e772b3dfa430bb0"
+SECRET_KEY = os.getenv("SECRET_KEY")
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+OPENWEATHER_LOCATION_URL = os.getenv("OPENWEATHER_LOCATION_URL")
+OPENWEATHER_WEATHER_URL = os.getenv("OPENWEATHER_WEATHER_URL")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -65,11 +71,11 @@ WSGI_APPLICATION = "core.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "weather_db",
-        "USER": "anton",
-        "PASSWORD": "anton",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": os.getenv("POSTGRES_DB", "mydb"),
+        "USER": os.getenv("POSTGRES_USER", "myuser"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "mypassword"),
+        "HOST": os.getenv("POSTGRES_HOST", "db"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
 
