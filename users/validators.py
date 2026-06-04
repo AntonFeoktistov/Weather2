@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 def validate_minimum_length(value, min_length=4):
     if len(value) < min_length:
         raise ValidationError(
-            f"Этот пароль слишком короткий. Он должен содержать минимум {min_length} символов."
+            "Этот пароль слишком короткий. Он должен содержать минимум 4 символа."
         )
 
 
