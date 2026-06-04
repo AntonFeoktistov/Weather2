@@ -5,7 +5,7 @@ from django.urls import reverse
 
 @dataclass(frozen=True, slots=True)
 class Urls:
-    home: str
+    home_url: str
     add_location_url: str
     delete_url: str
     refresh_url: str
@@ -15,11 +15,11 @@ class Urls:
 
     @property
     def referer(self) -> str:
-        return self.home
+        return self.home_url
 
 
 urls = Urls(
-    home=reverse("weather:home"),
+    home_url=reverse("weather:home"),
     add_location_url=reverse("weather:add_location"),
     delete_url=reverse("weather:delete_location"),
     refresh_url=reverse("weather:refresh_weather"),
