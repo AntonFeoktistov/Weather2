@@ -1,9 +1,11 @@
 import pytest
 from django.contrib.auth import get_user_model
-from django.core.management import call_command
 from django.test import Client
 from django.utils import timezone
-from myapp.models import Location
+
+from weather.dtos import LocationDto, WeatherDto
+from weather.models import Location
+from weather.weather_finder import WeatherFinder
 
 User = get_user_model()
 
@@ -40,7 +42,7 @@ def test_weather_dict():
 
 
 @pytest.fixture
-def test_location(db, test_user):
+def test_location(test_user):
     location = Location.objects.create(
         user=test_user,
         name="London",
@@ -56,7 +58,27 @@ def test_location(db, test_user):
     return location
 
 
-@pytest.fixture(autouse=True)
-def clear_db():
-    yield
-    call_command("flush", verbosity=0, interactive=False)
+@pytest.fixture
+def mock_finder(mocker):
+    location_dto = LocationDto(name_en="London", name_ru="Лондон", lat=51.5, lon=-0.1)
+    weather_dto = WeatherDto(
+        location=location_dto, temperature=15.5, description="cloudy", wind_speed=5.2
+    )
+    mock_weather = weather_dto
+
+    mock_finder = mocker.patch(
+        "weather.views.refresh_weather_view.RefreshWeatherView.weather_finder"
+    )
+    mock_finder.get_weather_by_location_name.return_value = mock_weather
+
+    return mock_finder
+
+
+@pytest.fixture
+def weather_finder():
+    return WeatherFinder()
+
+
+@pytest.fixture
+def location_dto():
+    return LocationDto(name_en="London", name_ru="Лондон", lat=51.5074, lon=-0.1278)

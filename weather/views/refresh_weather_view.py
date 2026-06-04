@@ -30,7 +30,6 @@ class RefreshWeatherView(LoginRequiredMixin, View):
                 location.save()
 
             except WeatherNotFoundError:
-                print(f"Weather not found for {location.name}")
                 continue
 
         return redirect(request.META.get("HTTP_REFERER", "weather:home"))

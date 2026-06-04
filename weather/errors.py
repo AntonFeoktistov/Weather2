@@ -4,7 +4,3 @@ class LocationNotFoundError(Exception):
 
 class WeatherNotFoundError(Exception):
     pass
-
-
-class WeatherServiceUnavailableError(Exception):
-    pass

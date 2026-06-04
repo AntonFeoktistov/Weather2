@@ -2,15 +2,16 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
+from tests.urls import urls
+
 User = get_user_model()
-register_url = reverse("users:register")
 pytestmark = pytest.mark.django_db
 
 
 def test_register_success(client):
 
     response = client.post(
-        register_url,
+        urls.register_url,
         {
             "username": "newuser",
             "password1": "pass123",
@@ -26,7 +27,7 @@ def test_register_success(client):
 def test_password_no_two_latin_letters(client):
 
     response = client.post(
-        register_url,
+        urls.register_url,
         {
             "username": "testuser",
             "password1": "123456",
@@ -48,7 +49,7 @@ def test_password_no_two_latin_letters(client):
 def test_password_no_two_digits(client):
 
     response = client.post(
-        register_url,
+        urls.register_url,
         {
             "username": "testuser",
             "password1": "abchello",
@@ -70,7 +71,7 @@ def test_password_no_two_digits(client):
 def test_passwords_do_not_match(client):
 
     response = client.post(
-        register_url,
+        urls.register_url,
         {
             "username": "testuser",
             "password1": "Valid123",
@@ -93,7 +94,7 @@ def test_passwords_do_not_match(client):
 def test_register_duplicate_username(client, test_user):
 
     response = client.post(
-        register_url,
+        urls.register_url,
         {
             "username": "testuser",
             "password1": "pass123",
@@ -112,7 +113,7 @@ def test_register_duplicate_username(client, test_user):
 def test_username_too_long(client):
 
     response = client.post(
-        register_url,
+        urls.register_url,
         {
             "username": "a" * 26,
             "password1": "ab12cd",
@@ -136,7 +137,7 @@ def test_password_too_long(client):
     long_password = "p" * 26 + "ab12"
 
     response = client.post(
-        register_url,
+        urls.register_url,
         {
             "username": "testuser",
             "password1": long_password,

@@ -6,7 +6,7 @@ from weather.errors import LocationNotFoundError, WeatherNotFoundError
 
 
 class WeatherFinder:
-    def get_weather_by_location_name(self, location_name):
+    def get_weather_by_location_name(self, location_name) -> WeatherDto:
         try:
             location = self._get_location_by_name(location_name)
             weather = self._get_weather_by_location(location)
@@ -14,11 +14,8 @@ class WeatherFinder:
         except (LocationNotFoundError, WeatherNotFoundError):
             raise WeatherNotFoundError()
 
-    def _get_location_by_name(self, location_name):
-        print(location_name)
-        print(settings.OPENWEATHER_API_KEY, settings.OPENWEATHER_LOCATION_URL)
+    def _get_location_by_name(self, location_name) -> LocationDto:
         try:
-            print(location_name)
             params = {
                 "q": location_name,
                 "limit": 1,
@@ -29,13 +26,12 @@ class WeatherFinder:
             )
             response.raise_for_status()
             location = response.json()[0]
-            print(location)
             location_dto = self._make_location_dto(location)
             return location_dto
         except Exception:
             raise LocationNotFoundError()
 
-    def _get_weather_by_location(self, location: LocationDto):
+    def _get_weather_by_location(self, location: LocationDto) -> WeatherDto:
         try:
             params = {
                 "lat": location.lat,
@@ -67,7 +63,6 @@ class WeatherFinder:
             "name_en": location["name"],
             "name_ru": name_ru,
         }
-        print(location_dict)
         location_dto = to_dto(LocationDto, location_dict)
         return location_dto
 
